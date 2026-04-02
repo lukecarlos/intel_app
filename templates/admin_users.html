@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - User Management</title>
+  <style>
+    :root {
+      --ink: #132734;
+      --paper: #f5efe4;
+      --panel: #fffaf1;
+      --line: #d6c6ad;
+      --accent: #1f6d73;
+      --warn: #9a6700;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #fbf4e7 0%, var(--paper) 56%, #ece2d2 100%);
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 22px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 26px rgba(19,39,52,0.1);
+      margin-bottom: 14px;
+    }
+    h1, h2, h3 { margin: 0 0 8px; font-family: "Merriweather", Georgia, serif; }
+    form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: end; }
+    .form2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: end; }
+    label { display: block; margin-bottom: 4px; font-size: 13px; font-weight: 700; }
+    input, select {
+      width: 100%;
+      border: 1px solid #c8b89b;
+      border-radius: 10px;
+      padding: 9px;
+      font: inherit;
+      background: #fff;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(180deg, var(--accent), #184f52);
+      color: #fff;
+      font-weight: 700;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid var(--line); padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #f0e7d8; }
+    .pill { font-size: 12px; padding: 3px 8px; border-radius: 999px; background: #ebf2f2; }
+    .msg { color: var(--warn); font-weight: 700; }
+    .topnav { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+    @media (max-width: 980px) {
+      form, .form2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <div class="topnav">
+        <a href="/">Back to Dashboard</a>
+        <span><strong>User:</strong> {{ username }}</span>
+        <span><strong>Role:</strong> {{ role }}</span>
+      </div>
+      <h1>User Administration</h1>
+      <p>Dedicated owner-only area for account creation, role updates, key reset, and activation control.</p>
+      {% if message %}<p class="msg">{{ message }}</p>{% endif %}
+    </section>
+
+    <section class="card">
+      <h2>Create User</h2>
+      <form method="post" action="/admin/users/create">
+        <div>
+          <label>Username</label>
+          <input name="username" required>
+        </div>
+        <div>
+          <label>Role</label>
+          <select name="role">
+            <option value="collaborator">collaborator</option>
+            <option value="owner">owner</option>
+          </select>
+        </div>
+        <div>
+          <label>Access Key</label>
+          <input name="access_key" type="password" required>
+        </div>
+        <div><button type="submit">Create Account</button></div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Accounts</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Active</th>
+            <th>Role Update</th>
+            <th>Reset Key</th>
+            <th>Activation</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td>{{ u['id'] }}</td>
+            <td>{{ u['username'] }}</td>
+            <td><span class="pill">{{ u['role'] }}</span></td>
+            <td>{{ u['active'] }}</td>
+            <td>
+              <form class="form2" method="post" action="/admin/users/{{ u['id'] }}/set-role">
+                <div>
+                  <label>Role</label>
+                  <select name="role">
+                    <option value="collaborator" {% if u['role'] == 'collaborator' %}selected{% endif %}>collaborator</option>
+                    <option value="owner" {% if u['role'] == 'owner' %}selected{% endif %}>owner</option>
+                  </select>
+                </div>
+                <div><button type="submit">Update</button></div>
+              </form>
+            </td>
+            <td>
+              <form class="form2" method="post" action="/admin/users/{{ u['id'] }}/reset-key">
+                <div>
+                  <label>New Access Key</label>
+                  <input name="new_access_key" type="password" required>
+                </div>
+                <div><button type="submit">Reset</button></div>
+              </form>
+            </td>
+            <td>
+              <form method="post" action="/admin/users/{{ u['id'] }}/toggle-active">
+                <button type="submit">{% if u['active'] == 1 %}Deactivate{% else %}Activate{% endif %}</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </div>
+</body>
+</html>

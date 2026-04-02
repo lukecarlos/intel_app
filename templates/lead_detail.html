@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lead Detail</title>
+  <style>
+    :root {
+      --ink: #152834;
+      --paper: #f5efe3;
+      --panel: #fffaf1;
+      --line: #d6c7b0;
+      --accent: #1f6e78;
+      --accent2: #d35a24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #faf4e7 0%, var(--paper) 45%, #ece2d2 100%);
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 22px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    }
+    h1, h2, h3 { margin: 0 0 8px; font-family: "Merriweather", Georgia, serif; }
+    ul { margin: 8px 0 0 16px; }
+    a { color: #0f4f85; text-decoration: none; }
+    .mono { font-family: Consolas, monospace; word-break: break-all; }
+    @media (max-width: 900px) { .row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" style="margin-bottom:14px;">
+      <h1>{{ lead['client_name'] or 'Lead ' ~ lead['id'] }}</h1>
+      <p><a href="/">Back to dashboard</a></p>
+      <p><strong>User:</strong> {{ username }} | <strong>Role:</strong> {{ role }}</p>
+      <form method="post" action="/logout"><button type="submit">Logout</button></form>
+      <p><strong>Status:</strong> {{ lead['status'] }} | <strong>Source:</strong> {{ lead['source'] }}</p>
+      <p><strong>URL:</strong> <a href="{{ lead['url'] }}" target="_blank">{{ lead['url'] }}</a></p>
+      <p><strong>Demo URL:</strong> {% if lead['demo_url'] %}<a href="{{ lead['demo_url'] }}" target="_blank">{{ lead['demo_url'] }}</a>{% else %}-{% endif %}</p>
+      <p><strong>Report Files:</strong> <a href="/report/{{ lead['id'] }}/json" target="_blank">json</a> | <a href="/report/{{ lead['id'] }}/md" target="_blank">md</a></p>
+    </div>
+
+    {% if report %}
+    <div class="row">
+      <section class="card">
+        <h2>Summary</h2>
+        <p><strong>Industry:</strong> {{ report['industry'] }}</p>
+        <p><strong>Readiness Score:</strong> {{ report['score'] }}/100</p>
+        <p><strong>Top Weaknesses:</strong></p>
+        <ul>
+          {% for w in report['weaknesses'][:4] %}<li>{{ w }}</li>{% endfor %}
+        </ul>
+      </section>
+      <section class="card">
+        <h2>Recommended Fixes</h2>
+        <ul>
+          {% for item in report['solution_mapping'][:5] %}
+            <li><strong>{{ item['weakness'] }}</strong><br>{{ ', '.join(item['recommended_solutions']) }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+
+    <div class="row">
+      <section class="card">
+        <h2>Email Contact Draft</h2>
+        <pre class="mono">{{ lead['email_draft'] or 'No draft generated yet.' }}</pre>
+      </section>
+      <section class="card">
+        <h2>Competitor Snapshot</h2>
+        <ul>
+          {% for c in report.get('competitors', []) %}
+            <li><strong>{{ c['name'] }}</strong> ({{ c['domain'] }})</li>
+          {% endfor %}
+          {% if not report.get('competitors') %}<li>No competitor sample in this run.</li>{% endif %}
+        </ul>
+      </section>
+    </div>
+    {% else %}
+      <section class="card">
+        <h2>No Report Yet</h2>
+        <p>This lead has not been scanned yet or the report file is missing.</p>
+      </section>
+    {% endif %}
+  </div>
+</body>
+</html>

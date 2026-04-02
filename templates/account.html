@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Settings</title>
+  <style>
+    :root {
+      --ink: #132734;
+      --paper: #f6efe3;
+      --panel: #fffaf2;
+      --line: #d5c5ad;
+      --accent: #1f6d73;
+      --warn: #9a6700;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #fbf4e6 0%, var(--paper) 56%, #ece2d2 100%);
+    }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 22px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 26px rgba(19,39,52,0.1);
+      margin-bottom: 14px;
+    }
+    h1, h2 { margin: 0 0 8px; font-family: "Merriweather", Georgia, serif; }
+    form { display: grid; gap: 8px; }
+    label { font-size: 13px; font-weight: 700; }
+    input {
+      width: 100%;
+      border: 1px solid #c8b89b;
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+      font: inherit;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(180deg, var(--accent), #174f52);
+      color: #fff;
+      font-weight: 700;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+    .msg { color: var(--warn); font-weight: 700; }
+    .nav { display: flex; gap: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <h1>Account Settings</h1>
+      <div class="nav">
+        <a href="/">Back to Dashboard</a>
+        {% if role == 'owner' %}<a href="/admin/users">User Admin</a>{% endif %}
+      </div>
+      <p><strong>User:</strong> {{ username }} | <strong>Role:</strong> {{ role }}</p>
+      {% if message %}<p class="msg">{{ message }}</p>{% endif %}
+    </section>
+
+    <section class="card">
+      <h2>Profile</h2>
+      <p><strong>Username:</strong> {{ user['username'] }}</p>
+      <p><strong>Role:</strong> {{ user['role'] }}</p>
+      <p><strong>Active:</strong> {{ user['active'] }}</p>
+      <p><strong>Created:</strong> {{ user['created_at'] }}</p>
+      <p><strong>Updated:</strong> {{ user['updated_at'] }}</p>
+    </section>
+
+    <section class="card">
+      <h2>Change Access Key</h2>
+      <form method="post" action="/account/change-key">
+        <label>Current Access Key</label>
+        <input name="current_access_key" type="password" required>
+
+        <label>New Access Key</label>
+        <input name="new_access_key" type="password" required>
+
+        <label>Confirm New Access Key</label>
+        <input name="confirm_new_access_key" type="password" required>
+
+        <button type="submit">Update Key</button>
+      </form>
+    </section>
+  </div>
+</body>
+</html>

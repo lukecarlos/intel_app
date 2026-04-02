@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Small Business Intelligence App</title>
+  <style>
+    :root {
+      --ink: #132734;
+      --paper: #f6efe2;
+      --panel: #fffaf1;
+      --line: #d6c6ad;
+      --accent: #1f6d73;
+      --danger: #b3261e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #fbf4e7 0%, var(--paper) 55%, #ece2d2 100%);
+    }
+    .card {
+      width: min(460px, 92vw);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 10px 26px rgba(19,39,52,0.12);
+    }
+    h1 { margin: 0 0 8px; font-family: "Merriweather", Georgia, serif; }
+    label { display: block; margin-bottom: 6px; font-weight: 700; }
+    input {
+      width: 100%;
+      border: 1px solid #c9b89b;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      font: inherit;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      background: linear-gradient(180deg, var(--accent), #194f53);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .error { color: var(--danger); font-weight: 700; }
+  </style>
+</head>
+<body>
+  <section class="card">
+    <h1>Small Business Intelligence App</h1>
+    <p>Enter your access key to continue.</p>
+    {% if easy_login %}<p><strong>Easy mode:</strong> trusted-network auto-login is enabled for local exploration.</p>{% endif %}
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <form method="post" action="/login">
+      <label>Username</label>
+      <input name="username" type="text" required>
+      <label>Access Key</label>
+      <input name="access_key" type="password" required>
+      <button type="submit">Login</button>
+    </form>
+  </section>
+</body>
+</html>
